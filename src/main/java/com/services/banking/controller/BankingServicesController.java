@@ -23,17 +23,17 @@ public class BankingServicesController {
 	BankingServices services;
 	
 	@PostMapping("/register")
-	public ResponseEntity<String> registerCustomer(@RequestBody CustomerDTO customer) {
-		return new ResponseEntity<>("Regiistration done successfully...", HttpStatus.ACCEPTED);
+	public ResponseEntity<String> registerCustomer(@RequestBody CustomerDTO custDTO) {
+		return new ResponseEntity<>(services.registerCustomer(custDTO), HttpStatus.ACCEPTED);
 	}
 	
 	@PostMapping("/account")
-	public ResponseEntity<String> createAccount(@RequestBody AccountDTO account) {
-		return new ResponseEntity<>("Account has been created successfully...", HttpStatus.ACCEPTED);		
+	public ResponseEntity<String> createAccount(@RequestBody AccountDTO accDTO) {
+		return new ResponseEntity<>(services.createBackAccountForCustomer(accDTO), HttpStatus.ACCEPTED);		
 	}
 	
 	@PostMapping("/fundTransfer")
-	public ResponseEntity<String> transferFunds(@RequestBody FundTransferDTO fundTransfer) {
+	public ResponseEntity<String> transferFunds(@RequestBody FundTransferDTO fundTransferDTO) {
 		return new ResponseEntity<>("Fund has been created successfully...", HttpStatus.ACCEPTED);		
 	}
 	
