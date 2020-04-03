@@ -1,5 +1,7 @@
 package com.services.banking.entity;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -35,6 +37,9 @@ public class Transaction {
 
 	@Column(name = "txn_amount")
 	private float txnAmount;
+	
+	@Column(name = "txn_date")
+	private Timestamp txnDate;
 
 	@ManyToOne
 	@JoinColumn(name = "acc_id")
