@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class TransactionDetails {
 	private String txnDate;
 	private float txnAmount;
-	private String fromAcc;
-	private String toAcc;
+	private String fromAccount;
+	private String toAccount;
 }
