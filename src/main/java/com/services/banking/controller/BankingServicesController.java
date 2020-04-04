@@ -29,12 +29,12 @@ public class BankingServicesController {
 	
 	@PostMapping("/account")
 	public ResponseEntity<String> createAccount(@RequestBody AccountDTO accDTO) {
-		return new ResponseEntity<>(services.createBackAccountForCustomer(accDTO), HttpStatus.ACCEPTED);		
+		return new ResponseEntity<>(services.createAccountForCustomer(accDTO), HttpStatus.ACCEPTED);		
 	}
 	
 	@PostMapping("/fundTransfer")
-	public ResponseEntity<String> transferFunds(@RequestBody FundTransferDTO fundTransferDTO) {
-		return new ResponseEntity<>("Fund has been created successfully...", HttpStatus.ACCEPTED);		
+	public ResponseEntity<String> transferFunds(@RequestBody FundTransferDTO ftDTO) {
+		return new ResponseEntity<>(services.transferFunds(ftDTO), HttpStatus.OK);		
 	}
 	
 	@GetMapping("/{custId}/statement")
