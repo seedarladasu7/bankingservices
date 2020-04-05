@@ -1,5 +1,7 @@
 package com.services.banking.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.services.banking.dto.AccountDTO;
 import com.services.banking.dto.CustomerDTO;
 import com.services.banking.dto.FundTransferDTO;
+import com.services.banking.entity.Transaction;
 import com.services.banking.service.BankingServices;
 
 @RestController
@@ -38,8 +41,8 @@ public class BankingServicesController {
 	}
 	
 	@GetMapping("/{custId}/statement")
-	public ResponseEntity<String> getStatement(@PathVariable("custId") Integer custId) {
-		return new ResponseEntity<>("Fund has been created successfully...", HttpStatus.ACCEPTED);		
+	public ResponseEntity<List<Transaction>> getStatement(@PathVariable("custId") Integer custId) {
+		return new ResponseEntity<>(services.retrieveCustomerBankStatement(custId), HttpStatus.ACCEPTED);		
 	}
 	
 	

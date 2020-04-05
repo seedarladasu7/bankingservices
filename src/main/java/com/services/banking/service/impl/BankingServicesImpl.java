@@ -2,6 +2,7 @@ package com.services.banking.service.impl;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -68,34 +69,35 @@ public class BankingServicesImpl implements BankingServices {
 
 		Account toAcc = accRepository.findByAccNumber(ftDTO.getToAccount());
 
-		float accBalance = fromAcc.getBalance();
 		float txnAmount = ftDTO.getTxnAmount();
 
 		if (fromAcc == null || toAcc == null) {
 			message = "Invalid Bank details provided...";
-		} else if (accBalance < ftDTO.getTxnAmount()) {
-			message = "Insufficient balance...";
 		}
 
 		if (StringUtils.isNotEmpty(message)) {
 			return message;
 		} else {
-			java.sql.Timestamp txnDateTS = java.sql.Timestamp.valueOf(simpDate.format(new Date()));
-			
-			if(fromAcc != null) {
-				fromAcc.setBalance(fromAcc.getBalance() - ftDTO.getTxnAmount());
-				accRepository.saveAndFlush(fromAcc);
-	
-				Transaction dtTxn = new Transaction();
-				dtTxn.setAccount(fromAcc);
-				dtTxn.setTxnType("Debit");
-				dtTxn.setTxnDate(txnDateTS);
-				dtTxn.setFromAccount(ftDTO.getFromAccount());
-				dtTxn.setToAccount(ftDTO.getToAccount());
-				dtTxn.setTxnAmount(txnAmount);
-				txnRepository.saveAndFlush(dtTxn);
+			if (fromAcc != null) {
+				float accBalance = fromAcc.getBalance();
+
+				if (accBalance < ftDTO.getTxnAmount()) {
+					message = "Insufficient balance...";
+				} else {
+					fromAcc.setBalance(fromAcc.getBalance() - ftDTO.getTxnAmount());
+					accRepository.saveAndFlush(fromAcc);
+
+					Transaction dtTxn = new Transaction();
+					dtTxn.setAccount(fromAcc);
+					dtTxn.setTxnType("Debit");
+					dtTxn.setTxnDate(java.sql.Timestamp.valueOf(simpDate.format(new Date())));
+					dtTxn.setFromAccount(ftDTO.getFromAccount());
+					dtTxn.setToAccount(ftDTO.getToAccount());
+					dtTxn.setTxnAmount(txnAmount);
+					txnRepository.saveAndFlush(dtTxn);
+				}
 			}
-			
+
 			if (toAcc != null) {
 				toAcc.setBalance(toAcc.getBalance() + ftDTO.getTxnAmount());
 				accRepository.saveAndFlush(toAcc);
@@ -103,7 +105,7 @@ public class BankingServicesImpl implements BankingServices {
 				Transaction crTxn = new Transaction();
 				crTxn.setAccount(toAcc);
 				crTxn.setTxnType("Credit");
-				crTxn.setTxnDate(txnDateTS);
+				crTxn.setTxnDate(java.sql.Timestamp.valueOf(simpDate.format(new Date())));
 				crTxn.setFromAccount(ftDTO.getFromAccount());
 				crTxn.setToAccount(ftDTO.getToAccount());
 				crTxn.setTxnAmount(txnAmount);
@@ -114,6 +116,41 @@ public class BankingServicesImpl implements BankingServices {
 
 		}
 		return message;
+	}
+
+	@Override
+	public List<Transaction> retrieveCustomerBankStatement(int custId) {
+
+		String message = "";
+
+		Optional<Customer> custOptnl = custRepository.findById(custId);
+
+		if (custOptnl.isPresent()) {
+			Customer customer = custOptnl.get();
+			Optional<List<Account>> accOptnl = accRepository.findByCustomer(customer);
+
+			if (accOptnl.isPresent()) {
+				List<Account> acctList = accOptnl.get();
+				Account account = acctList.get(0);
+
+				Optional<List<Transaction>> txnListOptnl = txnRepository.findByAccount(account);
+
+				if (txnListOptnl.isPresent()) {
+					List<Transaction> txnList = txnListOptnl.get();
+					return txnList;
+				} else {
+					message = "No transactions found for the account: " + account.getAccNumber();
+				}
+
+			} else {
+				message = "Invalid Account for customer: " + customer.getFirstName();
+			}
+
+		} else {
+			message = "Invalid customer with customer id: " + custId;
+		}
+
+		return null;
 	}
 
 }
